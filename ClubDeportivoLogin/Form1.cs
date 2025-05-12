@@ -30,11 +30,6 @@ namespace ClubDeportivoLogin
             if (reader.Read())
             {
                 MessageBox.Show("Login exitoso !!");
-
-                // Ejemplo: abrir otro formulario llamado MenuForm
-                // MenuForm menu = new MenuForm();
-                // menu.Show();
-                // this.Hide();
             }
             else
             {
