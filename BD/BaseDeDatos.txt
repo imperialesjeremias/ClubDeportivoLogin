@@ -1,0 +1,66 @@
+-- Base de datos ya seleccionada: ClubDeportivo
+
+CREATE TABLE Cliente (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(50),
+    apellido VARCHAR(50),
+    dni INT UNIQUE,
+    fechaNacimiento DATE,
+    direccion VARCHAR(100),
+    telefono VARCHAR(20),
+    aptoFisico BOOLEAN,
+    fechaAlta DATE
+);
+
+CREATE TABLE Socio (
+    id INT PRIMARY KEY,
+    fechaInscripcion DATE,
+    fechaVencimientoCuota DATE,
+    numeroCarnet INT,
+    carnetEntregado BOOLEAN,
+    estado VARCHAR(20),
+    fechaBaja DATE,
+    FOREIGN KEY (id) REFERENCES Cliente(id)
+);
+
+CREATE TABLE NoSocio (
+    id INT PRIMARY KEY,
+    FOREIGN KEY (id) REFERENCES Cliente(id)
+);
+
+CREATE TABLE Actividad (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(50),
+    costo DECIMAL(10,2)
+);
+
+CREATE TABLE RegistroActividad (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    idNoSocio INT,
+    idActividad INT,
+    fechaPago DATE,
+    montoCobrado DECIMAL(10,2),
+    medioPago VARCHAR(30),
+    FOREIGN KEY (idNoSocio) REFERENCES NoSocio(id),
+    FOREIGN KEY (idActividad) REFERENCES Actividad(id)
+);
+
+CREATE TABLE Cuota (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    idSocio INT,
+    fechaPago DATE,
+    monto DECIMAL(10,2),
+    medioPago VARCHAR(30),
+    cantidadCuotas INT,
+    fechaVencimiento DATE,
+    FOREIGN KEY (idSocio) REFERENCES Socio(id)
+);
+
+CREATE TABLE Usuarios (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    usuario VARCHAR(50) UNIQUE,
+    clave VARCHAR(50)
+);
+
+-- Agrego un usuario de prueba
+INSERT INTO Usuarios (usuario, clave) VALUES ('admin', '1234');
