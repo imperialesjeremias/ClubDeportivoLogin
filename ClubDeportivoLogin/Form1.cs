@@ -30,6 +30,11 @@ namespace ClubDeportivoLogin
             if (reader.Read())
             {
                 MessageBox.Show("Login exitoso !!");
+
+                this.Hide(); // Oculta el formulario de login
+                FormPrincipal principal = new FormPrincipal();
+                principal.FormClosed += (s, args) => this.Close(); // Cierra el login si se cierra el principal
+                principal.Show();
             }
             else
             {
