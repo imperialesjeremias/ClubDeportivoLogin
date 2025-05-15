@@ -11,7 +11,6 @@ namespace ClubDeportivoLogin
         {
             InitializeComponent();
         }
-
         private void btnLogin_Click(object sender, EventArgs e)
         {
             string usuario = txtUsuario.Text.Trim();
