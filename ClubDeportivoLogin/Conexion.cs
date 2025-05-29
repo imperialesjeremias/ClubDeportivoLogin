@@ -1,6 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Windows.Forms;
 
 namespace ClubDeportivoApp
 {
@@ -19,7 +18,7 @@ namespace ClubDeportivoApp
             {
                 conexion.Open();
                 //Solo se ve en consola
-                Console.WriteLine("✅ Conexión exitosa a la base de datos.");
+                Console.WriteLine("✅ Conexión exitosa a la base de datos.", "MENSAJE DEL SISTEMA", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
