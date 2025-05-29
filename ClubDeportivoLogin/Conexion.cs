@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using System.Windows.Forms; 
 
 namespace ClubDeportivoApp
 {
@@ -8,7 +9,7 @@ namespace ClubDeportivoApp
         private static string servidor = "localhost";
         private static string bd = "ClubDeportivo";
         private static string usuario = "root";
-        private static string password = "Claromeco2025"; //Clave de mi MSQ, ¡¿¿¿para usarlo desde otro????
+        private static string password = ""; //Clave servidor Local SQL
         private static string cadenaConexion = $"server={servidor}; database={bd}; user={usuario}; password={password};";
 
         public MySqlConnection Conectar()
@@ -23,7 +24,8 @@ namespace ClubDeportivoApp
             catch (Exception ex)
             {
                 // Mensaje de error
-                MessageBox.Show("❌ Error al conectar: " + ex.Message);
+
+                MessageBox.Show("❌ Error al conectar con la base de datos. " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return conexion;
         }

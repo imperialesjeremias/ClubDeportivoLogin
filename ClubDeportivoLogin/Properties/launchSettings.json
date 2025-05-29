@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "ClubDeportivoLogin": {
+      "commandName": "Project",
+      "sqlDebugging": false,
+      "nativeDebugging": false
+    }
+  }
+}
