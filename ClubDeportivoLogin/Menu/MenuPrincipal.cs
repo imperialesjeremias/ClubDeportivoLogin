@@ -1,4 +1,5 @@
-﻿using ClubDeportivoLogin.Menu.Pagos;
+﻿using ClubDeportivoLogin.Menu.ListadoMorosos;
+using ClubDeportivoLogin.Menu.Pagos;
 
 namespace ClubDeportivoLogin
 {
@@ -43,6 +44,12 @@ namespace ClubDeportivoLogin
         {
             frmComprobanteClub ventanaPago = new frmComprobanteClub();
             ventanaPago.ShowDialog(); // abre como ventana moda
+        }
+
+        private void btnLisMorosos_Click(object sender, EventArgs e)
+        {
+            frmSociosMorosos formMorosos = new frmSociosMorosos();
+            formMorosos.ShowDialog();
         }
     }
 }

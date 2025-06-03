@@ -73,6 +73,7 @@
             btnLisMorosos.TabIndex = 2;
             btnLisMorosos.Text = "LISTAR MOROSOS";
             btnLisMorosos.UseVisualStyleBackColor = false;
+            btnLisMorosos.Click += btnLisMorosos_Click;
             // 
             // usuarioActivo
             // 
