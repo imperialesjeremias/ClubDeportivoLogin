@@ -1,4 +1,6 @@
-﻿namespace ClubDeportivoLogin
+﻿using ClubDeportivoLogin.Menu.Pagos;
+
+namespace ClubDeportivoLogin
 {
     public partial class MenuPrincipal : Form
     {
@@ -35,6 +37,12 @@
         private void btnSalir_Click(object sender, EventArgs e)
         {
             Application.Exit(); // Cierra toda la aplicación
+        }
+
+        private void btnFacturar_Click(object sender, EventArgs e)
+        {
+            frmComprobanteClub ventanaPago = new frmComprobanteClub();
+            ventanaPago.ShowDialog(); // abre como ventana moda
         }
     }
 }

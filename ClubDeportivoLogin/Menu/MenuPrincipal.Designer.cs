@@ -61,6 +61,7 @@
             btnFacturar.TabIndex = 1;
             btnFacturar.Text = "FACTURAR";
             btnFacturar.UseVisualStyleBackColor = false;
+            btnFacturar.Click += btnFacturar_Click;
             // 
             // btnLisMorosos
             // 

@@ -9,7 +9,7 @@ namespace ClubDeportivoApp
         private static string servidor = "localhost";
         private static string bd = "ClubDeportivo";
         private static string usuario = "root";
-        private static string password = ""; //Clave servidor Local SQL
+        private static string password = "Claromeco2025"; //Clave servidor Local SQL
         private static string cadenaConexion = $"server={servidor}; database={bd}; user={usuario}; password={password};";
 
         public MySqlConnection Conectar()
