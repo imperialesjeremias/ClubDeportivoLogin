@@ -19,10 +19,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Menu\Clientes\ABMClientes.cs" />
+    <Compile Remove="Menu\Clientes\ABMClientes.Designer.cs" />
+    <Compile Remove="Menu\Pagos\frmComprobanteClub.cs" />
+    <Compile Remove="Menu\Pagos\frmComprobanteClub.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Menu\Clientes\ABMClientes.resx" />
+    <EmbeddedResource Remove="Menu\Pagos\frmComprobanteClub.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MySql.Data" Version="9.3.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Menu\Listar Clientes\FormListarClientes.cs" />
+    <Compile Update="Menu\Listar Pagos\FormListarPagos.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

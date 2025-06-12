@@ -1,6 +1,6 @@
-﻿namespace ClubDeportivoLogin.Menu.ListadoMorosos
+﻿namespace ClubDeportivoLogin
 {
-    partial class frmSociosMorosos
+    partial class FormListarMorosos
     {
         /// <summary>
         /// Required designer variable.
@@ -29,37 +29,57 @@
         private void InitializeComponent()
         {
             dgvMorosos = new DataGridView();
-            btnCargar = new Button();
+            btnSalir = new Button();
+            btnImprimir = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvMorosos).BeginInit();
             SuspendLayout();
             // 
             // dgvMorosos
             // 
+            dgvMorosos.BackgroundColor = SystemColors.Control;
             dgvMorosos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvMorosos.Location = new Point(12, 61);
+            dgvMorosos.Location = new Point(36, 31);
+            dgvMorosos.Margin = new Padding(3, 4, 3, 4);
             dgvMorosos.Name = "dgvMorosos";
-            dgvMorosos.Size = new Size(550, 377);
+            dgvMorosos.RowHeadersWidth = 47;
+            dgvMorosos.Size = new Size(596, 365);
             dgvMorosos.TabIndex = 0;
             // 
-            // btnCargar
+            // btnSalir
             // 
-            btnCargar.Location = new Point(568, 61);
-            btnCargar.Name = "btnCargar";
-            btnCargar.Size = new Size(75, 23);
-            btnCargar.TabIndex = 1;
-            btnCargar.Text = "Cargar";
-            btnCargar.UseVisualStyleBackColor = true;
-            btnCargar.Click += btnCargar_Click;
+            btnSalir.Location = new Point(483, 407);
+            btnSalir.Name = "btnSalir";
+            btnSalir.Size = new Size(149, 38);
+            btnSalir.TabIndex = 1;
+            btnSalir.Text = "SALIR";
+            btnSalir.UseVisualStyleBackColor = true;
+            btnSalir.Click += btnSalir_Click;
+            // 
+            // btnImprimir
+            // 
+            btnImprimir.Location = new Point(315, 407);
+            btnImprimir.Name = "btnImprimir";
+            btnImprimir.Size = new Size(149, 38);
+            btnImprimir.TabIndex = 2;
+            btnImprimir.Text = "IMPRIMIR";
+            btnImprimir.UseVisualStyleBackColor = true;
+            btnImprimir.Click += btnImprimir_Click;
             // 
             // frmSociosMorosos
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Controls.Add(btnCargar);
+            BackColor = SystemColors.ActiveCaption;
+            ClientSize = new Size(667, 457);
+            Controls.Add(btnImprimir);
+            Controls.Add(btnSalir);
             Controls.Add(dgvMorosos);
+            Margin = new Padding(3, 4, 3, 4);
             Name = "frmSociosMorosos";
-            Text = "frmSociosMorosos";
+            RightToLeftLayout = true;
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Listar Morosos";
+            Load += frmSociosMorosos_Load;
             ((System.ComponentModel.ISupportInitialize)dgvMorosos).EndInit();
             ResumeLayout(false);
         }
@@ -67,6 +87,7 @@
         #endregion
 
         private DataGridView dgvMorosos;
-        private Button btnCargar;
+        private Button btnSalir;
+        private Button btnImprimir;
     }
 }

@@ -1,33 +1,33 @@
 ﻿using MySql.Data.MySqlClient;
-using System;
-using System.Windows.Forms; 
 
-namespace ClubDeportivoApp
+namespace ClubDeportivoLogin
 {
     public class Conexion
     {
-        private static string servidor = "localhost";
-        private static string bd = "ClubDeportivo";
-        private static string usuario = "root";
-        private static string password = "Claromeco2025"; //Clave servidor Local SQL
-        private static string cadenaConexion = $"server={servidor}; database={bd}; user={usuario}; password={password};";
+        public static string Servidor { get; set; } = "localhost";
+        public static string BaseDatos { get; set; } = "ClubDeportivo";
+        public static string Usuario { get; set; } = "root";
+        public static string Password { get; set; } = "";
+
+        // Propiedad para la cadena de conexión
+        public static string CadenaConexion =>
+            $"server={Servidor};database={BaseDatos};user={Usuario};password={Password};";
 
         public MySqlConnection Conectar()
         {
-            MySqlConnection conexion = new MySqlConnection(cadenaConexion);
+            var conexion = new MySqlConnection(CadenaConexion);
             try
             {
                 conexion.Open();
-                //Solo se ve en consola
-                Console.WriteLine("✅ Conexión exitosa a la base de datos.", "MENSAJE DEL SISTEMA", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Console.WriteLine("Conexión exitosa a la base de datos");
+                return conexion;
             }
             catch (Exception ex)
             {
-                // Mensaje de error
-
-                MessageBox.Show("❌ Error al conectar con la base de datos. " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error al conectar: {ex.Message}", "Error de conexión",
+                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return null;
             }
-            return conexion;
         }
     }
 }

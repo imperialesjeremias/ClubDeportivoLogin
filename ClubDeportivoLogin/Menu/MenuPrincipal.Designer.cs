@@ -32,44 +32,49 @@
             btnFacturar = new Button();
             btnLisMorosos = new Button();
             usuarioActivo = new Label();
-            button3 = new Button();
-            button1 = new Button();
-            button2 = new Button();
+            btnABMActividades = new Button();
+            btnLisPagos = new Button();
+            btnLisClientes = new Button();
             cerrarSesion = new Button();
             btnSalir = new Button();
+            btnModPass = new Button();
+            btnUsers = new Button();
             SuspendLayout();
             // 
             // btnABMCliente
             // 
             btnABMCliente.BackColor = Color.FromArgb(255, 255, 192);
             btnABMCliente.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnABMCliente.Location = new Point(56, 68);
+            btnABMCliente.Location = new Point(64, 86);
+            btnABMCliente.Margin = new Padding(3, 4, 3, 4);
             btnABMCliente.Name = "btnABMCliente";
-            btnABMCliente.Size = new Size(128, 84);
+            btnABMCliente.Size = new Size(146, 106);
             btnABMCliente.TabIndex = 0;
             btnABMCliente.Text = "A.B.M. CLIENTES";
             btnABMCliente.UseVisualStyleBackColor = false;
-            btnABMCliente.Click += btnABMCliente_Click;
+            btnABMCliente.Click += btnABMClientes_Click;
             // 
             // btnFacturar
             // 
             btnFacturar.BackColor = Color.FromArgb(255, 255, 192);
             btnFacturar.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnFacturar.Location = new Point(215, 68);
+            btnFacturar.Location = new Point(246, 86);
+            btnFacturar.Margin = new Padding(3, 4, 3, 4);
             btnFacturar.Name = "btnFacturar";
-            btnFacturar.Size = new Size(128, 84);
+            btnFacturar.Size = new Size(146, 106);
             btnFacturar.TabIndex = 1;
-            btnFacturar.Text = "FACTURAR";
+            btnFacturar.Text = " A.B.M. \r\nPAGOS";
             btnFacturar.UseVisualStyleBackColor = false;
-            btnFacturar.Click += btnFacturar_Click;
+            btnFacturar.Click += btnPago_Click;
             // 
             // btnLisMorosos
             // 
             btnLisMorosos.BackColor = Color.FromArgb(255, 255, 192);
             btnLisMorosos.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnLisMorosos.Location = new Point(379, 68);
+            btnLisMorosos.Location = new Point(428, 234);
+            btnLisMorosos.Margin = new Padding(3, 4, 3, 4);
             btnLisMorosos.Name = "btnLisMorosos";
-            btnLisMorosos.Size = new Size(128, 84);
+            btnLisMorosos.Size = new Size(146, 106);
             btnLisMorosos.TabIndex = 2;
             btnLisMorosos.Text = "LISTAR MOROSOS";
             btnLisMorosos.UseVisualStyleBackColor = false;
@@ -80,49 +85,59 @@
             usuarioActivo.BackColor = SystemColors.InactiveCaption;
             usuarioActivo.Font = new Font("Segoe UI Semibold", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             usuarioActivo.ForeColor = Color.Blue;
-            usuarioActivo.Location = new Point(12, 19);
+            usuarioActivo.Location = new Point(14, 23);
             usuarioActivo.Name = "usuarioActivo";
-            usuarioActivo.Size = new Size(560, 30);
+            usuarioActivo.Size = new Size(640, 38);
             usuarioActivo.TabIndex = 3;
             usuarioActivo.TextAlign = ContentAlignment.MiddleLeft;
             usuarioActivo.Click += label1_Click;
             // 
-            // button3
+            // btnABMActividades
             // 
-            button3.BackColor = Color.FromArgb(224, 224, 224);
-            button3.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            button3.Location = new Point(56, 185);
-            button3.Name = "button3";
-            button3.Size = new Size(128, 84);
-            button3.TabIndex = 4;
-            button3.UseVisualStyleBackColor = false;
+            btnABMActividades.BackColor = Color.FromArgb(255, 255, 192);
+            btnABMActividades.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnABMActividades.Location = new Point(428, 86);
+            btnABMActividades.Margin = new Padding(3, 4, 3, 4);
+            btnABMActividades.Name = "btnABMActividades";
+            btnABMActividades.Size = new Size(146, 106);
+            btnABMActividades.TabIndex = 4;
+            btnABMActividades.Text = "A.B.M. ACTIVIDADES";
+            btnABMActividades.UseVisualStyleBackColor = false;
+            btnABMActividades.Click += btnABMActividad_Click;
             // 
-            // button1
+            // btnLisPagos
             // 
-            button1.BackColor = Color.FromArgb(224, 224, 224);
-            button1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            button1.Location = new Point(215, 185);
-            button1.Name = "button1";
-            button1.Size = new Size(128, 84);
-            button1.TabIndex = 5;
-            button1.UseVisualStyleBackColor = false;
+            btnLisPagos.BackColor = Color.FromArgb(255, 255, 192);
+            btnLisPagos.Font = new Font("Segoe UI", 11.1272726F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnLisPagos.Location = new Point(246, 234);
+            btnLisPagos.Margin = new Padding(3, 4, 3, 4);
+            btnLisPagos.Name = "btnLisPagos";
+            btnLisPagos.Size = new Size(146, 106);
+            btnLisPagos.TabIndex = 5;
+            btnLisPagos.Text = "LISTAR PAGOS HISTORICO";
+            btnLisPagos.UseVisualStyleBackColor = false;
+            btnLisPagos.Click += btnLisPagos_Click;
             // 
-            // button2
+            // btnLisClientes
             // 
-            button2.BackColor = Color.FromArgb(224, 224, 224);
-            button2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            button2.Location = new Point(379, 185);
-            button2.Name = "button2";
-            button2.Size = new Size(128, 84);
-            button2.TabIndex = 6;
-            button2.UseVisualStyleBackColor = false;
+            btnLisClientes.BackColor = Color.FromArgb(255, 255, 192);
+            btnLisClientes.Font = new Font("Segoe UI", 11.1272726F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnLisClientes.Location = new Point(64, 234);
+            btnLisClientes.Margin = new Padding(3, 4, 3, 4);
+            btnLisClientes.Name = "btnLisClientes";
+            btnLisClientes.Size = new Size(146, 106);
+            btnLisClientes.TabIndex = 6;
+            btnLisClientes.Text = "LISTAR CLIENTES HISTORICO";
+            btnLisClientes.UseVisualStyleBackColor = false;
+            btnLisClientes.Click += btnLisClientes_Click;
             // 
             // cerrarSesion
             // 
             cerrarSesion.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            cerrarSesion.Location = new Point(296, 319);
+            cerrarSesion.Location = new Point(338, 404);
+            cerrarSesion.Margin = new Padding(3, 4, 3, 4);
             cerrarSesion.Name = "cerrarSesion";
-            cerrarSesion.Size = new Size(130, 30);
+            cerrarSesion.Size = new Size(149, 38);
             cerrarSesion.TabIndex = 7;
             cerrarSesion.Text = "CERRAR SESION";
             cerrarSesion.UseVisualStyleBackColor = true;
@@ -131,29 +146,60 @@
             // btnSalir
             // 
             btnSalir.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnSalir.Location = new Point(442, 319);
+            btnSalir.Location = new Point(505, 404);
+            btnSalir.Margin = new Padding(3, 4, 3, 4);
             btnSalir.Name = "btnSalir";
-            btnSalir.Size = new Size(130, 30);
+            btnSalir.Size = new Size(149, 38);
             btnSalir.TabIndex = 8;
             btnSalir.Text = "SALIR";
             btnSalir.UseVisualStyleBackColor = true;
             btnSalir.Click += btnSalir_Click;
             // 
+            // btnModPass
+            // 
+            btnModPass.BackColor = Color.White;
+            btnModPass.Font = new Font("Segoe UI Semibold", 9.163636F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnModPass.ForeColor = Color.Blue;
+            btnModPass.Location = new Point(463, 25);
+            btnModPass.Name = "btnModPass";
+            btnModPass.Size = new Size(182, 32);
+            btnModPass.TabIndex = 9;
+            btnModPass.Text = "CAMBIAR CONTRASEÑA";
+            btnModPass.UseVisualStyleBackColor = false;
+            // 
+            // btnUsers
+            // 
+            btnUsers.BackColor = Color.FromArgb(255, 255, 192);
+            btnUsers.Font = new Font("Segoe UI Semibold", 9.818182F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnUsers.ForeColor = Color.FromArgb(192, 0, 0);
+            btnUsers.Location = new Point(64, 404);
+            btnUsers.Margin = new Padding(3, 4, 3, 4);
+            btnUsers.Name = "btnUsers";
+            btnUsers.Size = new Size(213, 38);
+            btnUsers.TabIndex = 10;
+            btnUsers.Text = "ADMINISTRAR USUARIOS";
+            btnUsers.UseVisualStyleBackColor = false;
+            btnUsers.Visible = false;
+            // 
             // MenuPrincipal
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaption;
-            ClientSize = new Size(584, 361);
+            CancelButton = cerrarSesion;
+            ClientSize = new Size(667, 457);
+            Controls.Add(btnUsers);
+            Controls.Add(btnModPass);
             Controls.Add(btnSalir);
             Controls.Add(cerrarSesion);
-            Controls.Add(button2);
-            Controls.Add(button1);
-            Controls.Add(button3);
+            Controls.Add(btnLisClientes);
+            Controls.Add(btnLisPagos);
+            Controls.Add(btnABMActividades);
             Controls.Add(usuarioActivo);
             Controls.Add(btnLisMorosos);
             Controls.Add(btnFacturar);
             Controls.Add(btnABMCliente);
+            Margin = new Padding(3, 4, 3, 4);
             Name = "MenuPrincipal";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "MENU PRINCIPAL";
@@ -167,10 +213,12 @@
         private Button btnFacturar;
         private Button btnLisMorosos;
         private Label usuarioActivo;
-        private Button button3;
-        private Button button1;
-        private Button button2;
+        private Button btnABMActividades;
+        private Button btnLisPagos;
+        private Button btnLisClientes;
         private Button cerrarSesion;
         private Button btnSalir;
+        private Button btnModPass;
+        private Button btnUsers;
     }
 }
