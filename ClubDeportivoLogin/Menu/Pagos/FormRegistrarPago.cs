@@ -100,7 +100,7 @@ namespace ClubDeportivoLogin
             {
                 btnImprimirS.Visible = false;
                 btnImprimirNS.Visible = false;
-                btnGuardar.Enabled = false;
+                btnGuardar.Visible = false;
                 btnBorrar.Visible = true;
                 btnBorrar.Enabled = true;
 
@@ -114,10 +114,10 @@ namespace ClubDeportivoLogin
                 {
                     using (var conn = conexion.Conectar())
                     using (var cmd = new MySqlCommand(
-                        @"SELECT c.*, cli.nombre, cli.apellido 
-                      FROM Cuota c 
-                      JOIN Cliente cli ON cli.id = c.idSocio 
-                      WHERE c.id = @id", conn))
+                        @"SELECT c.*, cli.nombre, cli.apellido, cli.dni
+                        FROM Cuota c 
+                        JOIN Cliente cli ON cli.id = c.idSocio 
+                        WHERE c.id = @id", conn))
                     {
                         cmd.Parameters.AddWithValue("@id", idComprobante);
                         using (var reader = cmd.ExecuteReader())
@@ -127,7 +127,7 @@ namespace ClubDeportivoLogin
                                 tabControl1.SelectedTab = tabPage1;
                                 tabPage2.Parent = null;
                                 int idSocio = Convert.ToInt32(reader["idSocio"]);
-                                lblDniS.Text = idSocio.ToString();
+                                lblDniS.Text = reader["dni"].ToString();
                                 txtMontoS.Text = reader["monto"].ToString();
                                 txtDescuentoS.Text = reader["descuento"].ToString();
                                 comboMedPagoS.Items.Clear();
@@ -156,9 +156,10 @@ namespace ClubDeportivoLogin
                 {
                     using (var conn = conexion.Conectar())
                     using (var cmd = new MySqlCommand(
-                        @"SELECT r.*, cli.nombre, cli.apellido 
-                        FROM RegistroActividad r 
-                        JOIN Cliente cli ON cli.id = r.idNoSocio 
+                        @"SELECT r.*, cli.nombre, cli.apellido, cli.dni, a.id AS idActividad, a.nombre AS nombreActividad, a.costo AS costoActividad
+                        FROM RegistroActividad r
+                        JOIN Cliente cli ON cli.id = r.idNoSocio
+                        JOIN Actividad a ON a.id = r.idActividad
                         WHERE r.id = @id", conn))
                     {
                         cmd.Parameters.AddWithValue("@id", idComprobante);
@@ -169,7 +170,7 @@ namespace ClubDeportivoLogin
                                 tabControl1.SelectedTab = tabPage2;
                                 tabPage1.Parent = null;
                                 int idNoSocio = Convert.ToInt32(reader["idNoSocio"]);
-                                lblDniNS.Text = idNoSocio.ToString();
+                                lblDniNS.Text = reader["dni"].ToString();
                                 txtMontoNS.Text = reader["monto"].ToString();
                                 txtDescuentoNS.Text = reader["descuento"].ToString();
                                 comboMedPagoNS.Items.Clear();
@@ -178,12 +179,26 @@ namespace ClubDeportivoLogin
                                 dateFePagoNS.Value = Convert.ToDateTime(reader["fechaPago"]);
                                 ultimoIdPago = Convert.ToInt32(reader["id"]);
                                 lblClienteNS.Text = $"{reader["nombre"]} {reader["apellido"]}";
+                                comboBox1.Text = reader["nombreActividad"].ToString();
                                 txtMontoNS.Enabled = false;
                                 txtDescuentoNS.Enabled = false;
                                 comboMedPagoNS.Enabled = false;
                                 dateFePagoNS.Enabled = false;
                                 btnImprimirNS.Visible = true;
                                 btnImprimirNS.Enabled = true;
+                                comboBox1.Enabled = false;
+                                btnAgregarActividad.Visible = false;
+
+                                // Seleccionar la actividad en el combo
+                                int idActividad = Convert.ToInt32(reader["idActividad"]);
+                                foreach (var item in comboBox1.Items)
+                                {
+                                    if (item is ActividadCombo act && act.Id == idActividad)
+                                    {
+                                        comboBox1.SelectedItem = act;
+                                        break;
+                                    }
+                                }
                             }
                             else
                             {
@@ -206,7 +221,7 @@ namespace ClubDeportivoLogin
         {
             id = 0;
             using (var conn = conexion.Conectar())
-            using (var cmd = new MySqlCommand("SELECT id, nombre, apellido FROM Cliente WHERE dni=@dni", conn))
+            using (var cmd = new MySqlCommand("SELECT id, nombre, apellido, dni FROM Cliente WHERE dni=@dni", conn))
             {
                 cmd.Parameters.AddWithValue("@dni", dni);
                 using (var reader = cmd.ExecuteReader())
@@ -214,7 +229,8 @@ namespace ClubDeportivoLogin
                     if (reader.Read())
                     {
                         id = reader.GetInt32(0);
-                        lblDniS.Text = lblDniNS.Text = dni.ToString();
+                        int dni2 = reader.GetInt32(3);
+                        lblDniS.Text = lblDniNS.Text = dni2.ToString();
                         lblClienteS.Text = lblClienteNS.Text = $"{reader.GetString(1)} {reader.GetString(2)}";
                         return true;
                     }
@@ -236,7 +252,49 @@ namespace ClubDeportivoLogin
 
         private void CargarDatosSocio()
         {
-            lblEstadoS.Text = "SOCIO AL DIA";
+            btnAgregarActividad.Visible = false;
+
+            // Buscar la cuota pendiente del socio (solo una)
+            DateTime? fechaVencimiento = null;
+            decimal? monto = null;
+
+            using (var conn = conexion.Conectar())
+            using (var cmd = new MySqlCommand(
+                "SELECT fechaVencimiento, monto FROM Cuota WHERE idSocio=@idSocio AND fechaPago IS NULL ORDER BY fechaVencimiento ASC LIMIT 1", conn))
+            {
+                cmd.Parameters.AddWithValue("@idSocio", idCliente);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        fechaVencimiento = reader.IsDBNull(0) ? (DateTime?)null : reader.GetDateTime(0);
+                        monto = reader.IsDBNull(1) ? (decimal?)null : reader.GetDecimal(1);
+                    }
+                }
+            }
+
+            if (fechaVencimiento.HasValue)
+            {
+                // Calcular diferencia de días respecto a la fecha de pago seleccionada
+                int diferenciaDias = (dateFePagoS.Value.Date - fechaVencimiento.Value.Date).Days;
+                string estado;
+                if (diferenciaDias < 0)
+                    estado = $"{fechaVencimiento:dd/MM/yy} ({Math.Abs(diferenciaDias)} días antes)";
+                else if (diferenciaDias > 0)
+                    estado = $"{fechaVencimiento:dd/MM/yy} ({diferenciaDias} días despues)";
+                else
+                    estado = $"{fechaVencimiento:dd/MM/yy} (Vence Hoy)";
+                lblEstadoS.Text = estado;
+                if (monto.HasValue)
+                    txtMontoS.Text = monto.Value.ToString("0.00");
+            }
+            else
+            {
+                lblEstadoS.Text = "No hay cuota pendiente";
+                txtMontoS.Text = "";
+            }
+
+            comboMedPagoS.Items.Clear();
             comboMedPagoS.Items.AddRange(new string[] { "Efectivo", "Credito", "Debito" });
             comboMedPagoS.SelectedIndex = 0;
             txtCuotasS.Visible = false;
@@ -247,18 +305,19 @@ namespace ClubDeportivoLogin
                 txtCuotasS.Visible = lblCuotasS.Visible = esCredito;
             };
 
-            using (var conn = conexion.Conectar())
-            using (var cmd = new MySqlCommand("SELECT monto FROM Cuota WHERE idSocio=@idSocio AND fechaPago IS NOT NULL ORDER BY fechaPago DESC LIMIT 1", conn))
-            {
-                cmd.Parameters.AddWithValue("@idSocio", idCliente);
-                var result = cmd.ExecuteScalar();
-                if (result != null)
-                    txtMontoS.Text = result.ToString();
-            }
+            // Actualizar el label cada vez que cambia la fecha de pago
+            dateFePagoS.ValueChanged -= FechaPagoS_ValueChanged;
+            dateFePagoS.ValueChanged += FechaPagoS_ValueChanged;
+        }
+
+        private void FechaPagoS_ValueChanged(object sender, EventArgs e)
+        {
+            CargarDatosSocio();
         }
 
         private void CargarDatosNoSocio()
         {
+            btnAgregarActividad.Visible = true;
             comboMedPagoNS.Items.Clear();
             comboMedPagoNS.Items.AddRange(new string[] { "Efectivo", "Credito", "Debito" });
             comboMedPagoNS.SelectedIndex = 0;
@@ -269,9 +328,8 @@ namespace ClubDeportivoLogin
                 bool esCredito = comboMedPagoNS.SelectedItem.ToString() == "Credito";
                 txtCuotasNS.Visible = lblCuotasNS.Visible = esCredito;
             };
-            comboBox1.Items.Clear();
             using (var conn = conexion.Conectar())
-            using (var cmd = new MySqlCommand("SELECT id, nombre FROM Actividad", conn))
+            using (var cmd = new MySqlCommand("SELECT id, nombre, costo FROM Actividad", conn))
             using (var reader = cmd.ExecuteReader())
             {
                 while (reader.Read())
@@ -287,13 +345,45 @@ namespace ClubDeportivoLogin
             comboBox1.DisplayMember = "Nombre";
             comboBox1.ValueMember = "Id";
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
+            comboBox1.Enabled = true;
+        }
+
+        private void CargarActividades()
+        {
+            comboBox1.Items.Clear();
+
+            using (var conn = conexion.Conectar())
+            using (var cmd = new MySqlCommand("SELECT id, nombre FROM Actividad", conn))
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    comboBox1.Items.Add(new ActividadCombo
+                    {
+                        Id = Convert.ToInt32(reader["id"]),
+                        Nombre = reader["nombre"].ToString()
+                    });
+                }
+            }
+        }
+
+        public class ActividadCombo
+        {
+            public int Id { get; set; }
+            public string Nombre { get; set; }
+            public decimal Precio { get; set; }
+
+            public override string ToString()
+            {
+                return Nombre;
+            }
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox1.SelectedItem is not ActividadCombo actividad) return;
             using (var conn = conexion.Conectar())
-            using (var cmd = new MySqlCommand("SELECT monto FROM Actividad WHERE id=@id", conn))
+            using (var cmd = new MySqlCommand("SELECT costo FROM Actividad WHERE id=@id", conn))
             {
                 cmd.Parameters.AddWithValue("@id", actividad.Id);
                 var result = cmd.ExecuteScalar();
@@ -307,7 +397,7 @@ namespace ClubDeportivoLogin
             if (comboBox1.SelectedItem == null) return;
             int idActividad = ((dynamic)comboBox1.SelectedItem).Id;
             using (var conn = conexion.Conectar())
-            using (var cmd = new MySqlCommand("SELECT monto FROM Actividad WHERE id=@id", conn))
+            using (var cmd = new MySqlCommand("SELECT costo FROM Actividad WHERE id=@id", conn))
             {
                 cmd.Parameters.AddWithValue("@id", idActividad);
                 var result = cmd.ExecuteScalar();
@@ -319,9 +409,9 @@ namespace ClubDeportivoLogin
                         var res = MessageBox.Show("¿Desea actualizar el monto de la actividad en la tabla?", "Actualizar monto", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                         if (res == DialogResult.Yes)
                         {
-                            using (var cmdUpdate = new MySqlCommand("UPDATE Actividad SET monto=@monto WHERE id=@id", conn))
+                            using (var cmdUpdate = new MySqlCommand("UPDATE Actividad SET costo=@costo WHERE id=@id", conn))
                             {
-                                cmdUpdate.Parameters.AddWithValue("@monto", nuevoMonto);
+                                cmdUpdate.Parameters.AddWithValue("@costo", nuevoMonto);
                                 cmdUpdate.Parameters.AddWithValue("@id", idActividad);
                                 cmdUpdate.ExecuteNonQuery();
                                 MessageBox.Show("Monto actualizado en la tabla Actividad.", "Actualizado", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -339,76 +429,134 @@ namespace ClubDeportivoLogin
 
             comboBox1.Items.Clear();
             using (var conn = conexion.Conectar())
-            using (var cmd = new MySqlCommand("SELECT id, nombre FROM Actividad", conn))
+            using (var cmd = new MySqlCommand("SELECT id, nombre, costo FROM Actividad", conn))
             using (var reader = cmd.ExecuteReader())
             {
                 while (reader.Read())
                 {
-                    comboBox1.Items.Add(new { Id = reader.GetInt32(0), Nombre = reader.GetString(1) });
+                    comboBox1.Items.Add(new ActividadCombo
+                    {
+                        Id = reader.GetInt32(0),
+                        Nombre = reader.GetString(1),
+                        Precio = reader.GetDecimal(2)
+                    });
                 }
             }
             comboBox1.DisplayMember = "Nombre";
             comboBox1.ValueMember = "Id";
         }
 
-        private void CalcularTotalDescuentoSocio()
+        private decimal? CalcularTotalDescuentoSocio()
         {
             if (decimal.TryParse(txtMontoS.Text, out decimal monto))
             {
                 decimal descuento = 0;
-                if (!string.IsNullOrWhiteSpace(txtDescuentoS.Text))
-                    decimal.TryParse(txtDescuentoS.Text, out descuento);
+                bool descuentoValido = false;
 
-                if (descuento < 0 || descuento > 100)
+                if (!string.IsNullOrWhiteSpace(txtDescuentoS.Text))
+                    descuentoValido = decimal.TryParse(txtDescuentoS.Text, out descuento);
+
+                // Si se ingresó un descuento válido y no está en el rango 0–100, entonces es inválido
+                if (descuentoValido && (descuento < 0 || descuento > 100))
                 {
-                    lblTotalDescuentoS.Text = "Descuento inválido";
-                    return;
+                    lblTotalDescuentoNS.Text = "Descuento inválido";
+                    return null;
                 }
 
-                decimal total = monto - (monto * (descuento / 100));
-                lblTotalDescuentoS.Text = $"TOTAL A COBRAR: $ {total:0.00}";
+                if (!descuentoValido || descuento == 0)
+                {
+                    lblTotalDescuentoNS.Text = $"TOTAL A ABONAR: $ {monto:0.00}";
+                    return monto;
+                }
+                else
+                {
+                    decimal total = monto - (monto * (descuento / 100));
+                    lblTotalDescuentoNS.Text = $"TOTAL A ABONAR: $ {total:0.00}";
+                    return total;
+                }
             }
             else
             {
-                lblTotalDescuentoS.Text = "";
+                lblTotalDescuentoNS.Text = "Monto inválido";
+                return null;
             }
         }
 
-        private void CalcularTotalDescuentoNoSocio()
+        private decimal? CalcularTotalDescuentoNoSocio()
         {
             if (decimal.TryParse(txtMontoNS.Text, out decimal monto))
             {
                 decimal descuento = 0;
-                if (!string.IsNullOrWhiteSpace(txtDescuentoNS.Text))
-                    decimal.TryParse(txtDescuentoNS.Text, out descuento);
+                bool descuentoValido = false;
 
-                if (descuento < 0 || descuento > 100)
+                if (!string.IsNullOrWhiteSpace(txtDescuentoNS.Text))
+                    descuentoValido = decimal.TryParse(txtDescuentoNS.Text, out descuento);
+
+                if (descuentoValido && (descuento < 0 || descuento > 100))
                 {
-                    lblTotalDescuento.Text = "Descuento inválido";
-                    return;
+                    lblTotalDescuentoNS.Text = "Descuento inválido";
+                    return null;
                 }
 
-                decimal total = monto - (monto * (descuento / 100));
-                lblTotalDescuento.Text = $"TOTAL A COBRAR: $ {total:0.00}";
+                // Si el descuento es 0 o no se ingresó nada válido, muestro el monto sin restar nada
+                if (!descuentoValido || descuento == 0)
+                {
+                    lblTotalDescuentoNS.Text = $"TOTAL A ABONAR: $ {monto:0.00}";
+                    return monto;
+                }
+                else
+                {
+                    decimal total = monto - (monto * (descuento / 100));
+                    lblTotalDescuentoNS.Text = $"TOTAL A ABONAR: $ {total:0.00}";
+                    return total;
+                }
             }
             else
             {
-                lblTotalDescuento.Text = "";
+                lblTotalDescuentoNS.Text = "Monto inválido";
+                return null;
             }
         }
 
+        private int ObtenerIdSocioPorIdCliente(int idCliente)
+        {
+            using (var conn = conexion.Conectar())
+            using (var cmd = new MySqlCommand("SELECT id FROM Socio WHERE id=@idCliente AND fechaBaja IS NULL", conn))
+            {
+                cmd.Parameters.AddWithValue("@idCliente", idCliente);
+                var result = cmd.ExecuteScalar();
+                if (result != null)
+                    return Convert.ToInt32(result);
+                else
+                    throw new Exception("No se encontró el registro de Socio activo para este cliente.");
+            }
+        }
+
+        private int ObtenerIdNoSocioPorIdCliente(int idCliente)
+        {
+            using (var conn = conexion.Conectar())
+            using (var cmd = new MySqlCommand("SELECT id FROM NoSocio WHERE id=@id", conn))
+            {
+                cmd.Parameters.AddWithValue("@id", idCliente);
+                var result = cmd.ExecuteScalar();
+                if (result != null)
+                    return Convert.ToInt32(result);
+                else
+                    throw new Exception("No se encontró el registro de NoSocio para este cliente.");
+            }
+        }
         private void btnGuardar_Click(object sender, EventArgs e)
         {
             string resumen;
             if (esSocio)
             {
                 if (!ValidarPagoSocio()) return;
-                resumen = $"DNI: {lblDniS.Text}\nCliente: {lblClienteS.Text}\nFecha: {dateFePagoS.Value.ToShortDateString()}\nTotal: $ {txtDescuentoS.Text}\nMedio: {comboMedPagoS.Text}";
+                resumen = $"\nCliente: {lblClienteS.Text}\nDNI: {lblDniS.Text}\nFecha: {dateFePagoS.Value.ToShortDateString()}\nMedio: {comboMedPagoS.Text}\n\n{lblTotalDescuentoS.Text}";
             }
             else
             {
                 if (!ValidarPagoNoSocio()) return;
-                resumen = $"DNI: {lblDniNS.Text}\nCliente: {lblClienteNS.Text}\nActividad: {comboBox1.Text}\nFecha: {dateFePagoNS.Value.ToShortDateString()}\nTotal: $ {txtDescuentoNS.Text}\nMedio: {comboMedPagoNS.Text}";
+                resumen = $"\nCliente: {lblClienteNS.Text}\nDNI: {lblDniNS.Text}\nActividad: {comboBox1.Text}\nFecha: {dateFePagoNS.Value.ToShortDateString()}\nMedio: {comboMedPagoNS.Text}\n\n{lblTotalDescuentoNS.Text}";
             }
 
             DialogResult dr = MessageBox.Show(
@@ -422,21 +570,26 @@ namespace ClubDeportivoLogin
 
             if (esSocio)
             {
+                decimal? montoTotal = CalcularTotalDescuentoSocio();
+                if (montoTotal == null)
+                {
+                    MessageBox.Show("No se puede guardar el pago. Monto o descuento inválido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                int idSocio = ObtenerIdSocioPorIdCliente(idCliente);
+
                 using (var conn = conexion.Conectar())
                 {
                     var cmd = new MySqlCommand(@"INSERT INTO Cuota 
                     (idSocio, fechaPago, monto, medioPago, cantidadCuotas, descuento, montoTotal, fechaVencimiento, comprobante)
                     VALUES (@idSocio, @fechaPago, @monto, @medioPago, @cuotas, @descuento, @montoTotal, @fechaVenc, @comprobante)", conn);
-                    cmd.Parameters.AddWithValue("@idSocio", idCliente);
+                    cmd.Parameters.AddWithValue("@idSocio", idSocio);
                     cmd.Parameters.AddWithValue("@fechaPago", dateFePagoS.Value);
                     cmd.Parameters.AddWithValue("@monto", decimal.Parse(txtMontoS.Text));
                     cmd.Parameters.AddWithValue("@medioPago", comboMedPagoS.SelectedItem.ToString());
                     cmd.Parameters.AddWithValue("@cuotas", comboMedPagoS.SelectedItem.ToString() == "Credito" ? int.Parse(txtCuotasS.Text) : 1);
                     cmd.Parameters.AddWithValue("@descuento", string.IsNullOrWhiteSpace(txtDescuentoS.Text) ? 0 : decimal.Parse(txtDescuentoS.Text));
-                    decimal monto = decimal.Parse(txtMontoS.Text);
-                    decimal descuento = string.IsNullOrWhiteSpace(txtDescuentoS.Text) ? 0 : decimal.Parse(txtDescuentoS.Text);
-                    decimal montoTotal = monto - (monto * (descuento / 100));
-                    cmd.Parameters.AddWithValue("@montoTotal", montoTotal);
+                    cmd.Parameters.AddWithValue("@montoTotal", montoTotal.Value);
                     cmd.Parameters.AddWithValue("@fechaVenc", dateFePagoS.Value.AddMonths(1));
                     cmd.Parameters.AddWithValue("@comprobante", DBNull.Value);
                     cmd.ExecuteNonQuery();
@@ -468,21 +621,25 @@ namespace ClubDeportivoLogin
             }
             else
             {
+                decimal? montoTotal = CalcularTotalDescuentoNoSocio();
+                if (montoTotal == null)
+                {
+                    MessageBox.Show("No se puede guardar el pago. Monto o descuento inválido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                int idNoSocio = ObtenerIdNoSocioPorIdCliente(idCliente);
                 using (var conn = conexion.Conectar())
                 {
                     var cmd = new MySqlCommand(@"INSERT INTO RegistroActividad 
                     (idNoSocio, idActividad, fechaPago, monto, medioPago, cantidadCuotas, descuento, montoTotal, comprobante)
                     VALUES (@idNoSocio, @idActividad, @fechaPago, @monto, @medioPago, @cuotas, @descuento, @montoTotal, @comprobante)", conn);
-                    cmd.Parameters.AddWithValue("@idNoSocio", idCliente);
+                    cmd.Parameters.AddWithValue("@idNoSocio", idNoSocio);
                     cmd.Parameters.AddWithValue("@idActividad", ((dynamic)comboBox1.SelectedItem).Id);
                     cmd.Parameters.AddWithValue("@fechaPago", dateFePagoNS.Value);
                     cmd.Parameters.AddWithValue("@monto", decimal.Parse(txtMontoNS.Text));
                     cmd.Parameters.AddWithValue("@medioPago", comboMedPagoNS.SelectedItem.ToString());
                     cmd.Parameters.AddWithValue("@cuotas", comboMedPagoNS.SelectedItem.ToString() == "Credito" ? int.Parse(txtCuotasNS.Text) : 1);
                     cmd.Parameters.AddWithValue("@descuento", string.IsNullOrWhiteSpace(txtDescuentoNS.Text) ? 0 : decimal.Parse(txtDescuentoNS.Text));
-                    decimal monto = decimal.Parse(txtMontoNS.Text);
-                    decimal descuento = string.IsNullOrWhiteSpace(txtDescuentoNS.Text) ? 0 : decimal.Parse(txtDescuentoNS.Text);
-                    decimal montoTotal = monto - (monto * (descuento / 100));
                     cmd.Parameters.AddWithValue("@montoTotal", montoTotal);
                     cmd.Parameters.AddWithValue("@comprobante", DBNull.Value);
                     cmd.ExecuteNonQuery();
@@ -740,7 +897,7 @@ namespace ClubDeportivoLogin
         private void btnImprimirNS_Click(object sender, EventArgs e)
         {
             PrintDocument printDoc = new PrintDocument();
-            printDoc.DefaultPageSettings.PaperSize = new PaperSize("Recibo", 280, 350);
+            printDoc.DefaultPageSettings.PaperSize = new PaperSize("Recibo", 280, 380);
             printDoc.PrintPage += ComprobanteNoSocio;
 
             PrintPreviewDialog preview = new PrintPreviewDialog
@@ -769,7 +926,7 @@ namespace ClubDeportivoLogin
 
 
             // Datos del club
-            e.Graphics.DrawString("CLUB DEPORTIVO", fontBold, Brushes.Black, left, y);
+            e.Graphics.DrawString("CLUB DEPORTIVO", fontBold2, Brushes.Black, left, y);
             y += 22;
             e.Graphics.DrawString("Av. San Martin 1234 - Ciudad", fontBody2, Brushes.Black, left, y);
             y += 18;
@@ -779,7 +936,7 @@ namespace ClubDeportivoLogin
             y += 18;
 
             // Línea separadora
-            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, left, y);
+            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, 0, y);
             y += 18;
 
             // Datos del comprobante
@@ -787,31 +944,31 @@ namespace ClubDeportivoLogin
             y += 20;
             e.Graphics.DrawString($"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}", fontBody, Brushes.Black, left, y);
             y += 18;
-            e.Graphics.DrawString($"Comprobante: 100{ultimoIdPago}", fontBody, Brushes.Black, left, y);
+            e.Graphics.DrawString($"Comprobante N°: 100-{ultimoIdPago}", fontBody, Brushes.Black, left, y);
             y += 18;
             e.Graphics.DrawString($"Socio: {lblClienteS.Text}", fontBody, Brushes.Black, left, y);
             y += 18;
             e.Graphics.DrawString($"DNI: {lblDniS.Text}", fontBody, Brushes.Black, left, y);
             y += 18;
-            e.Graphics.DrawString($"Monto original: $ {txtMontoS.Text}", fontBody, Brushes.Black, left, y);
+            e.Graphics.DrawString($"Concepto:...........[Acceso Total]", fontBody, Brushes.Black, left, y);
+            y += 18;
+            e.Graphics.DrawString($"Monto original:.... $ {txtMontoS.Text}", fontBody, Brushes.Black, left, y);
             y += 18;
             e.Graphics.DrawString($"Descuento: {txtDescuentoS.Text}% ", fontBody, Brushes.Black, left, y);
             y += 18;
-            decimal monto = decimal.TryParse(txtMontoS.Text, out var m) ? m : 0;
-            decimal descuento = decimal.TryParse(txtDescuentoS.Text, out var d) ? d : 0;
-            decimal total = monto - (monto * (descuento / 100));
+            decimal? total = CalcularTotalDescuentoSocio();
             // Línea separadora
-            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, left, y);
+            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, 0, y);
             y += 18;
             e.Graphics.DrawString($"TOTAL A ABONAR: $ {total:0.00}", fontBold2, Brushes.Black, left, y);
+            y += 25;
+            e.Graphics.DrawString($"Medio de pago: {comboMedPagoS.Text}", fontBody, Brushes.Black, left, y);
             y += 18;
             e.Graphics.DrawString($"Estado: PAGADO", fontBold, Brushes.Black, left, y);
             y += 18;
-            e.Graphics.DrawString($"Medio de pago: {comboMedPagoS.Text}", fontBody, Brushes.Black, left, y);
-            y += 18;
 
             // Línea separadora
-            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, left, y);
+            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, 0, y);
             y += 18;
 
             // Pie
@@ -833,7 +990,7 @@ namespace ClubDeportivoLogin
 
 
             // Datos del club
-            e.Graphics.DrawString("CLUB DEPORTIVO", fontBold, Brushes.Black, left, y);
+            e.Graphics.DrawString("CLUB DEPORTIVO", fontBold2, Brushes.Black, left, y);
             y += 22;
             e.Graphics.DrawString("Av. San Martin 1234 - Ciudad", fontBody2, Brushes.Black, left, y);
             y += 18;
@@ -843,7 +1000,7 @@ namespace ClubDeportivoLogin
             y += 18;
 
             // Línea separadora
-            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, left, y);
+            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, 0, y);
             y += 18;
 
             // Datos del comprobante
@@ -851,31 +1008,31 @@ namespace ClubDeportivoLogin
             y += 20;
             e.Graphics.DrawString($"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}", fontBody, Brushes.Black, left, y);
             y += 18;
-            e.Graphics.DrawString($"Comprobante: 200{ultimoIdPago}", fontBody, Brushes.Black, left, y);
+            e.Graphics.DrawString($"Comprobante N°: 200-{ultimoIdPago}", fontBody, Brushes.Black, left, y);
             y += 18;
-            e.Graphics.DrawString($"Socio: {lblClienteNS.Text}", fontBody, Brushes.Black, left, y);
+            e.Graphics.DrawString($"No Socio: {lblClienteNS.Text}", fontBody, Brushes.Black, left, y);
             y += 18;
             e.Graphics.DrawString($"DNI: {lblDniNS.Text}", fontBody, Brushes.Black, left, y);
             y += 18;
-            e.Graphics.DrawString($"Monto original: $ {txtMontoNS.Text}", fontBody, Brushes.Black, left, y);
+            e.Graphics.DrawString($"Concepto:...........{comboBox1.Text}", fontBody, Brushes.Black, left, y);
+            y += 18;
+            e.Graphics.DrawString($"Monto original:.....$ {txtMontoNS.Text}", fontBody, Brushes.Black, left, y);
             y += 18;
             e.Graphics.DrawString($"Descuento: {txtDescuentoNS.Text}% ", fontBody, Brushes.Black, left, y);
             y += 18;
-            decimal monto = decimal.TryParse(txtMontoS.Text, out var m) ? m : 0;
-            decimal descuento = decimal.TryParse(txtDescuentoNS.Text, out var d) ? d : 0;
-            decimal total = monto - (monto * (descuento / 100));
+            decimal? total = CalcularTotalDescuentoNoSocio();
             // Línea separadora
-            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, left, y);
+            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, 0, y);
             y += 18;
             e.Graphics.DrawString($"TOTAL A ABONAR: $ {total:0.00}", fontBold2, Brushes.Black, left, y);
+            y += 25;
+            e.Graphics.DrawString($"Medio de pago: {comboMedPagoNS.Text}", fontBody, Brushes.Black, left, y);
             y += 18;
             e.Graphics.DrawString($"Estado: PAGADO", fontBold, Brushes.Black, left, y);
             y += 18;
-            e.Graphics.DrawString($"Medio de pago: {comboMedPagoNS.Text}", fontBody, Brushes.Black, left, y);
-            y += 18;
 
             // Línea separadora
-            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, left, y);
+            e.Graphics.DrawString("----------------------------------------", fontBody, Brushes.Black, 0, y);
             y += 18;
 
             // Pie
@@ -885,15 +1042,6 @@ namespace ClubDeportivoLogin
         private void btnSalir_Click(object sender, EventArgs e)
         {
             this.Close();
-        }
-
-        public class ActividadCombo
-        {
-            public int Id { get; set; }
-            public string Nombre { get; set; }
-            public decimal Precio { get; set; }
-
-            public override string ToString() => $"{Nombre} - ${Precio}";
         }
     }
 }

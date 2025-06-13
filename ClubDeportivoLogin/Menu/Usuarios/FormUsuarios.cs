@@ -193,6 +193,31 @@ namespace ClubDeportivoLogin.Menu.Usuarios
                 MessageBox.Show("No hay usuario existente para borrar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
+            // Validar si el usuario es administrador
+            if (rolOriginal == "ADMINISTRADOR")
+            {
+                try
+                {
+                    Conexion conn = new Conexion();
+                    using (var conexion = conn.Conectar())
+                    using (var cmd = new MySqlCommand("SELECT COUNT(*) FROM usuarios WHERE rol = 'ADMINISTRADOR'", conexion))
+                    {
+                        int adminCount = Convert.ToInt32(cmd.ExecuteScalar());
+                        if (adminCount <= 1)
+                        {
+                            MessageBox.Show("No se puede eliminar este usuario porque debe existir al menos un administrador en el sistema.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al validar administradores: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
             var confirm = MessageBox.Show("¿Está seguro que desea eliminar este usuario? Esta acción no se puede revertir.", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (confirm != DialogResult.Yes)
                 return;

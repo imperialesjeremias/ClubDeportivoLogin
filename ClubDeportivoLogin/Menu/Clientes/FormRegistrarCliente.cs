@@ -136,7 +136,7 @@ namespace ClubDeportivoLogin
 
             if (telefono.Length == 10)
             {
-                txtTelefono.Text = string.Format("{0:(###) ###-####}", double.Parse(telefono));
+                txtTelefono.Text = string.Format("{0:(####) ##-####}", double.Parse(telefono));
             }
             else
             {
@@ -422,7 +422,10 @@ namespace ClubDeportivoLogin
                     }
                     else
                     {
-                        ConvertirANoSocio(conn, idCliente);
+                        var insertarNoSocio = new MySqlCommand(
+                            "INSERT IGNORE INTO NoSocio (id) VALUES (@id)", conn);
+                        insertarNoSocio.Parameters.AddWithValue("@id", idCliente);
+                        insertarNoSocio.ExecuteNonQuery();
                     }
 
                     transaccion.Commit();
@@ -539,17 +542,14 @@ namespace ClubDeportivoLogin
                 "UPDATE Socio SET fechaBaja = CURDATE() WHERE id = @id",
                 conn);
             actualizarSocio.Parameters.AddWithValue("@id", id);
-            int filasAfectadas = actualizarSocio.ExecuteNonQuery();
+            actualizarSocio.ExecuteNonQuery();
 
-            // Registrar como no socio solo si era socio
-            if (filasAfectadas > 0)
-            {
-                var insertarNoSocio = new MySqlCommand(
-                    "INSERT IGNORE INTO NoSocio (id) VALUES (@id)",
-                    conn);
-                insertarNoSocio.Parameters.AddWithValue("@id", id);
-                insertarNoSocio.ExecuteNonQuery();
-            }
+            // Registrar como no socio SIEMPRE (haya sido socio o no)
+            var insertarNoSocio = new MySqlCommand(
+                "INSERT IGNORE INTO NoSocio (id) VALUES (@id)",
+                conn);
+            insertarNoSocio.Parameters.AddWithValue("@id", id);
+            insertarNoSocio.ExecuteNonQuery();
         }
 
         private void BloquearCamposPago()

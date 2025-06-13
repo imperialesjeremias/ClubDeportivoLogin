@@ -60,7 +60,7 @@
             lblClienteNS = new Label();
             label10 = new Label();
             panel2 = new Panel();
-            lblTotalDescuento = new Label();
+            lblTotalDescuentoNS = new Label();
             label6 = new Label();
             txtCuotasNS = new TextBox();
             txtDescuentoNS = new TextBox();
@@ -246,7 +246,7 @@
             // 
             lblEstadoS.BorderStyle = BorderStyle.FixedSingle;
             lblEstadoS.Font = new Font("Segoe UI Semibold", 9.818182F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblEstadoS.Location = new Point(184, 110);
+            lblEstadoS.Location = new Point(184, 114);
             lblEstadoS.Name = "lblEstadoS";
             lblEstadoS.Size = new Size(214, 27);
             lblEstadoS.TabIndex = 33;
@@ -258,9 +258,9 @@
             label11.Font = new Font("Segoe UI Semibold", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
             label11.Location = new Point(25, 117);
             label11.Name = "label11";
-            label11.Size = new Size(58, 20);
+            label11.Size = new Size(142, 20);
             label11.TabIndex = 32;
-            label11.Text = "Estado:";
+            label11.Text = "Vencimiento Cuota:";
             // 
             // dateFePagoS
             // 
@@ -286,7 +286,7 @@
             // 
             lblClienteS.BorderStyle = BorderStyle.FixedSingle;
             lblClienteS.Font = new Font("Segoe UI Semibold", 11.7818184F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblClienteS.Location = new Point(184, 71);
+            lblClienteS.Location = new Point(184, 73);
             lblClienteS.Name = "lblClienteS";
             lblClienteS.Size = new Size(214, 27);
             lblClienteS.TabIndex = 29;
@@ -428,7 +428,7 @@
             // 
             // panel2
             // 
-            panel2.Controls.Add(lblTotalDescuento);
+            panel2.Controls.Add(lblTotalDescuentoNS);
             panel2.Controls.Add(label6);
             panel2.Controls.Add(txtCuotasNS);
             panel2.Controls.Add(txtDescuentoNS);
@@ -444,15 +444,15 @@
             panel2.Size = new Size(571, 132);
             panel2.TabIndex = 30;
             // 
-            // lblTotalDescuento
+            // lblTotalDescuentoNS
             // 
-            lblTotalDescuento.Font = new Font("Segoe UI Semibold", 11.1272726F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lblTotalDescuento.ForeColor = Color.DarkGreen;
-            lblTotalDescuento.Location = new Point(223, 11);
-            lblTotalDescuento.Name = "lblTotalDescuento";
-            lblTotalDescuento.Size = new Size(339, 29);
-            lblTotalDescuento.TabIndex = 33;
-            lblTotalDescuento.TextAlign = ContentAlignment.MiddleRight;
+            lblTotalDescuentoNS.Font = new Font("Segoe UI Semibold", 11.1272726F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblTotalDescuentoNS.ForeColor = Color.DarkGreen;
+            lblTotalDescuentoNS.Location = new Point(223, 11);
+            lblTotalDescuentoNS.Name = "lblTotalDescuentoNS";
+            lblTotalDescuentoNS.Size = new Size(339, 29);
+            lblTotalDescuentoNS.TabIndex = 33;
+            lblTotalDescuentoNS.TextAlign = ContentAlignment.MiddleRight;
             // 
             // label6
             // 
@@ -661,7 +661,7 @@
         private TextBox txtMontoS;
         private ComboBox comboMedPagoS;
         private Panel panel2;
-        private Label lblTotalDescuento;
+        private Label lblTotalDescuentoNS;
         private Label label6;
         private TextBox txtCuotasNS;
         private TextBox txtDescuentoNS;

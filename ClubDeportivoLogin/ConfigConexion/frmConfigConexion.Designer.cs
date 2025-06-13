@@ -136,7 +136,7 @@
             // 
             // btnProbar
             // 
-            btnProbar.Font = new Font("Segoe UI Semibold", 9.163636F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnProbar.Font = new Font("Segoe UI Semibold", 7.85454559F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnProbar.Location = new Point(265, 212);
             btnProbar.Margin = new Padding(4);
             btnProbar.Name = "btnProbar";
