@@ -8,6 +8,7 @@ namespace ClubDeportivoLogin
     {
         private Conexion conexion = new Conexion();
         private int dniCliente;
+        private bool _clienteExiste;
 
         public FormRegistrarCliente(int dni)
         {
@@ -18,6 +19,7 @@ namespace ClubDeportivoLogin
             // Mostrar mensaje inicial sobre el DNI
             using (var conn = conexion.Conectar())
             {
+                _clienteExiste = VerificarExistenciaDNI(conn, dni);
                 bool existe = VerificarExistenciaDNI(conn, dni);
                 if (existe)
                 {
@@ -528,30 +530,6 @@ namespace ClubDeportivoLogin
             }
         }
 
-        private void ConvertirANoSocio(MySqlConnection conn, int id)
-        {
-            // Eliminar cuotas futuras adeudadas (no vencidas)
-            var eliminarCuotas = new MySqlCommand(
-                "DELETE FROM Cuota WHERE idSocio = @id AND fechaPago IS NULL AND fechaVencimiento > CURDATE()",
-                conn);
-            eliminarCuotas.Parameters.AddWithValue("@id", id);
-            eliminarCuotas.ExecuteNonQuery();
-
-            // Actualizar socio (solo si existe)
-            var actualizarSocio = new MySqlCommand(
-                "UPDATE Socio SET fechaBaja = CURDATE() WHERE id = @id",
-                conn);
-            actualizarSocio.Parameters.AddWithValue("@id", id);
-            actualizarSocio.ExecuteNonQuery();
-
-            // Registrar como no socio SIEMPRE (haya sido socio o no)
-            var insertarNoSocio = new MySqlCommand(
-                "INSERT IGNORE INTO NoSocio (id) VALUES (@id)",
-                conn);
-            insertarNoSocio.Parameters.AddWithValue("@id", id);
-            insertarNoSocio.ExecuteNonQuery();
-        }
-
         private void BloquearCamposPago()
         {
             txtMonto.Enabled = false;
@@ -719,9 +697,13 @@ namespace ClubDeportivoLogin
 
         private void ObtenerNumeroCarnet(MySqlConnection conn)
         {
-            var cmd = new MySqlCommand("SELECT COALESCE(MAX(numeroCarnet),0) FROM Socio", conn);
-            int max = Convert.ToInt32(cmd.ExecuteScalar());
-            lblNumCarnet.Text = (max + 1).ToString();
+            // Solo generar nuevo número si no hay uno existente
+            if (string.IsNullOrEmpty(lblNumCarnet.Text) || lblNumCarnet.Text == "0")
+            {
+                var cmd = new MySqlCommand("SELECT COALESCE(MAX(numeroCarnet),0) FROM Socio", conn);
+                int max = Convert.ToInt32(cmd.ExecuteScalar());
+                lblNumCarnet.Text = (max + 1).ToString();
+            }
         }
 
         private bool ValidarCamposObligatorios()
@@ -813,7 +795,19 @@ namespace ClubDeportivoLogin
                 lblTipoCliente.Text = "REGISTRAR - SOCIO";
                 lblTipoCliente.ForeColor = Color.Blue;
                 lblEstado.ForeColor = Color.Black;
-                ObtenerNumeroCarnet(conexion.Conectar());
+
+                using (var conn = conexion.Conectar())
+                {
+                    // Obtener ID del cliente si existe
+                    int idCliente = _clienteExiste ? GetClienteId(conn) : 0;
+
+                    // Recuperar número de carnet anterior si es ex-socio
+                    RecuperarCarnetAnterior(conn, idCliente);
+
+                    // Mostrar mensaje de antigüedad si es ex-socio
+                    MostrarAntiguedadExSocio(conn, idCliente);
+                }
+
                 tabControl1.SelectedTab = tabPage2;
                 dtpVencimiento.Focus();
             }
@@ -822,6 +816,62 @@ namespace ClubDeportivoLogin
                 tabPage2.Parent = null;
                 lblTipoCliente.Text = "REGISTRAR - NO SOCIO";
                 lblTipoCliente.ForeColor = Color.FromArgb(192, 0, 0);
+            }
+        }
+
+        private void RecuperarCarnetAnterior(MySqlConnection conn, int idCliente)
+        {
+            if (idCliente > 0)
+            {
+                var cmd = new MySqlCommand(
+                    "SELECT numeroCarnet FROM Socio WHERE id = @id AND fechaBaja IS NOT NULL",
+                    conn);
+                cmd.Parameters.AddWithValue("@id", idCliente);
+
+                var result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    lblNumCarnet.Text = result.ToString();
+                    return;
+                }
+            }
+            ObtenerNumeroCarnet(conn);
+        }
+
+        private void MostrarAntiguedadExSocio(MySqlConnection conn, int idCliente)
+        {
+            if (idCliente > 0)
+            {
+                var cmd = new MySqlCommand(
+                    @"SELECT fechaInscripcion, fechaBaja 
+            FROM Socio 
+            WHERE id = @id AND fechaBaja IS NOT NULL",
+                    conn);
+                cmd.Parameters.AddWithValue("@id", idCliente);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        DateTime inicio = reader.GetDateTime(0);
+                        DateTime fin = reader.GetDateTime(1);
+
+                        int años = fin.Year - inicio.Year;
+                        int meses = fin.Month - inicio.Month;
+                        if (meses < 0)
+                        {
+                            años--;
+                            meses += 12;
+                        }
+
+                        MessageBox.Show(
+                            $"Este cliente fue socio anteriormente durante {años} años y {meses} meses.\n" +
+                            $"Período: {inicio:dd/MM/yyyy} - {fin:dd/MM/yyyy}",
+                            "Antigüedad de Socio",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+                    }
+                }
             }
         }
 
@@ -1007,14 +1057,7 @@ namespace ClubDeportivoLogin
                 return "SOCIO AL DIA";
             }
 
-            public static string CalcularEstadoCuota(DateTime? fechaPago, DateTime fechaVencimiento)
-            {
-                if (fechaPago != null)
-                    return "PAGADA";
-                if (fechaVencimiento < DateTime.Today)
-                    return "VENCIDA";
-                return "ADEUDADA";
-            }
         }
+
     }
 }

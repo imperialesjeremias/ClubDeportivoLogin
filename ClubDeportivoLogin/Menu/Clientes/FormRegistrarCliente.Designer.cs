@@ -287,6 +287,7 @@
             // 
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
+            tabControl1.Font = new Font("Segoe UI", 7.85454559F, FontStyle.Regular, GraphicsUnit.Point, 0);
             tabControl1.Location = new Point(41, 15);
             tabControl1.Margin = new Padding(3, 4, 3, 4);
             tabControl1.Name = "tabControl1";
@@ -342,11 +343,11 @@
             tabPage2.Controls.Add(dtpVencimiento);
             tabPage2.Controls.Add(chkCarnetEntregado);
             tabPage2.Controls.Add(label9);
-            tabPage2.Location = new Point(4, 28);
+            tabPage2.Location = new Point(4, 24);
             tabPage2.Margin = new Padding(3, 4, 3, 4);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3, 4, 3, 4);
-            tabPage2.Size = new Size(583, 313);
+            tabPage2.Size = new Size(583, 317);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Datos Socio";
             tabPage2.UseVisualStyleBackColor = true;
@@ -355,9 +356,9 @@
             // 
             btnImprimirCarnet.BackColor = Color.FromArgb(255, 255, 192);
             btnImprimirCarnet.Font = new Font("Segoe UI Semibold", 9.163636F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            btnImprimirCarnet.Location = new Point(442, 39);
+            btnImprimirCarnet.Location = new Point(406, 37);
             btnImprimirCarnet.Name = "btnImprimirCarnet";
-            btnImprimirCarnet.Size = new Size(127, 29);
+            btnImprimirCarnet.Size = new Size(173, 29);
             btnImprimirCarnet.TabIndex = 30;
             btnImprimirCarnet.Text = "Imprimir Carnet";
             btnImprimirCarnet.UseVisualStyleBackColor = false;
@@ -407,7 +408,7 @@
             txtCuotas.Location = new Point(453, 95);
             txtCuotas.Margin = new Padding(3, 4, 3, 4);
             txtCuotas.Name = "txtCuotas";
-            txtCuotas.Size = new Size(76, 26);
+            txtCuotas.Size = new Size(76, 23);
             txtCuotas.TabIndex = 31;
             txtCuotas.TextAlign = HorizontalAlignment.Center;
             // 
@@ -416,7 +417,7 @@
             txtDescuento.Location = new Point(453, 53);
             txtDescuento.Margin = new Padding(3, 4, 3, 4);
             txtDescuento.Name = "txtDescuento";
-            txtDescuento.Size = new Size(76, 26);
+            txtDescuento.Size = new Size(76, 23);
             txtDescuento.TabIndex = 30;
             txtDescuento.TextAlign = HorizontalAlignment.Center;
             // 
@@ -465,7 +466,7 @@
             txtMonto.Location = new Point(141, 52);
             txtMonto.Margin = new Padding(3, 4, 3, 4);
             txtMonto.Name = "txtMonto";
-            txtMonto.Size = new Size(138, 26);
+            txtMonto.Size = new Size(138, 23);
             txtMonto.TabIndex = 25;
             // 
             // comboMedPago
@@ -475,7 +476,7 @@
             comboMedPago.Location = new Point(141, 95);
             comboMedPago.Margin = new Padding(3, 4, 3, 4);
             comboMedPago.Name = "comboMedPago";
-            comboMedPago.Size = new Size(138, 27);
+            comboMedPago.Size = new Size(138, 23);
             comboMedPago.TabIndex = 27;
             // 
             // lblFeBaja
@@ -494,13 +495,13 @@
             // 
             dateBaja.Checked = false;
             dateBaja.CustomFormat = "\"dd/MM/yyyy\"";
-            dateBaja.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dateBaja.Font = new Font("Segoe UI", 9.163636F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dateBaja.Format = DateTimePickerFormat.Custom;
             dateBaja.Location = new Point(396, 134);
             dateBaja.Margin = new Padding(3, 4, 3, 4);
             dateBaja.Name = "dateBaja";
             dateBaja.ShowCheckBox = true;
-            dateBaja.Size = new Size(158, 27);
+            dateBaja.Size = new Size(158, 26);
             dateBaja.TabIndex = 22;
             dateBaja.Visible = false;
             // 

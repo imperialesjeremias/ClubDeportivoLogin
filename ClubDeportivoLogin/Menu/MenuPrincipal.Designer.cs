@@ -160,9 +160,9 @@
             btnModPass.BackColor = Color.White;
             btnModPass.Font = new Font("Segoe UI Semibold", 9.163636F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnModPass.ForeColor = Color.Blue;
-            btnModPass.Location = new Point(463, 25);
+            btnModPass.Location = new Point(446, 25);
             btnModPass.Name = "btnModPass";
-            btnModPass.Size = new Size(182, 32);
+            btnModPass.Size = new Size(199, 32);
             btnModPass.TabIndex = 9;
             btnModPass.Text = "CAMBIAR CONTRASEÑA";
             btnModPass.UseVisualStyleBackColor = false;
@@ -170,12 +170,12 @@
             // btnUsers
             // 
             btnUsers.BackColor = Color.FromArgb(255, 255, 192);
-            btnUsers.Font = new Font("Segoe UI Semibold", 9.818182F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnUsers.Font = new Font("Segoe UI Semibold", 9.163636F, FontStyle.Bold, GraphicsUnit.Point, 0);
             btnUsers.ForeColor = Color.FromArgb(192, 0, 0);
             btnUsers.Location = new Point(64, 404);
             btnUsers.Margin = new Padding(3, 4, 3, 4);
             btnUsers.Name = "btnUsers";
-            btnUsers.Size = new Size(213, 38);
+            btnUsers.Size = new Size(268, 38);
             btnUsers.TabIndex = 10;
             btnUsers.Text = "ADMINISTRAR USUARIOS";
             btnUsers.UseVisualStyleBackColor = false;
