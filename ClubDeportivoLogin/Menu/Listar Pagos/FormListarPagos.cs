@@ -67,7 +67,7 @@ namespace ClubDeportivoLogin.pagos
                 DATE_FORMAT(r.fechaPago, '%d/%m/%Y') AS 'Fecha de Pago',
                 CONCAT(cli.nombre, ' ', cli.apellido) AS 'Nombre y Apellido',
                 r.medioPago AS 'Medio de Pago',
-                CONCAT('$ ', FORMAT(r.montoTotal, 2, 'es_AR')) AS 'Monto Total',
+                CONCAT('$ ', FORMAT(r.montoCobrado, 2, 'es_AR')) AS 'Monto Total',
                 'PASE DIARIO' AS Concepto,
                 a.nombre AS Actividad
                 FROM RegistroActividad r

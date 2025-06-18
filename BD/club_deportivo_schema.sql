@@ -85,6 +85,9 @@ CREATE TABLE `cuota` (
   `medioPago` varchar(30) DEFAULT NULL,
   `cantidadCuotas` int DEFAULT NULL,
   `fechaVencimiento` date DEFAULT NULL,
+  `descuento` decimal(5,2) DEFAULT 0,
+  `monto` decimal(10,2) DEFAULT NULL,
+  `montoTotal` decimal(10,2) default,
   PRIMARY KEY (`id`),
   KEY `idSocio` (`idSocio`),
   CONSTRAINT `cuota_ibfk_1` FOREIGN KEY (`idSocio`) REFERENCES `socio` (`id`)
